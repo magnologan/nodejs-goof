@@ -1,1 +1,1 @@
-Teste de branch protection v6 - Teste Pull Request Template
+Testing Code Owners with Branch Protection
