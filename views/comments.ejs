@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/css/screen.css' />
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .comment { 
+            border: 1px solid #ddd; 
+            padding: 10px; 
+            margin: 10px 0; 
+            background-color: #f9f9f9; 
+        }
+        .comment-author { font-weight: bold; color: #333; }
+        .comment-text { margin: 5px 0; }
+        .comment-time { font-size: 0.8em; color: #666; }
+        .form-group { margin: 10px 0; }
+        .form-group label { display: block; margin-bottom: 5px; }
+        .form-group input, .form-group textarea { 
+            width: 100%; 
+            padding: 8px; 
+            border: 1px solid #ddd; 
+        }
+        .btn { 
+            padding: 10px 20px; 
+            background-color: #007cba; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+        }
+        .message { 
+            padding: 10px; 
+            margin: 10px 0; 
+            background-color: #d4edda; 
+            border: 1px solid #c3e6cb; 
+            color: #155724; 
+        }
+        .search-form { 
+            background-color: #e9ecef; 
+            padding: 15px; 
+            margin: 20px 0; 
+        }
+        .vulnerability-warning {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1><%= title %></h1>
+    
+    <div class="vulnerability-warning">
+        <strong>⚠️ SECURITY WARNING:</strong> This page intentionally contains XSS vulnerabilities for educational purposes. 
+        Do not use this code in production!
+    </div>
+
+    <% if (message) { %>
+        <!-- VULNERABILITY: Direct rendering of message parameter without escaping -->
+        <div class="message"><%- message %></div>
+    <% } %>
+
+    <!-- Search Form -->
+    <div class="search-form">
+        <h3>Search Comments</h3>
+        <form action="/comments/search" method="GET">
+            <div class="form-group">
+                <label for="search">Search Term:</label>
+                <!-- VULNERABILITY: searchTerm rendered without escaping -->
+                <input type="text" id="search" name="q" value="<%= typeof searchTerm !== 'undefined' ? searchTerm : '' %>" />
+            </div>
+            <button type="submit" class="btn">Search</button>
+        </form>
+    </div>
+
+    <!-- Add Comment Form -->
+    <h3>Add a Comment</h3>
+    <form action="/comments" method="POST">
+        <div class="form-group">
+            <label for="author">Name:</label>
+            <input type="text" id="author" name="author" placeholder="Your name (optional)" />
+        </div>
+        <div class="form-group">
+            <label for="comment">Comment:</label>
+            <textarea id="comment" name="comment" rows="4" placeholder="Enter your comment here..." required></textarea>
+        </div>
+        <button type="submit" class="btn">Add Comment</button>
+    </form>
+
+    <!-- Display Comments -->
+    <h3>Comments (<%= comments.length %>)</h3>
+    <% if (comments.length === 0) { %>
+        <p>No comments yet. Be the first to comment!</p>
+    <% } else { %>
+        <% comments.forEach(function(comment) { %>
+            <div class="comment">
+                <!-- VULNERABILITY: User input rendered without escaping using <%- %> -->
+                <div class="comment-author"><%- comment.author %></div>
+                <div class="comment-text"><%- comment.text %></div>
+                <div class="comment-time"><%= comment.timestamp %></div>
+            </div>
+        <% }); %>
+    <% } %>
+
+    <div style="margin-top: 40px; padding: 20px; background-color: #fff3cd; border: 1px solid #ffeaa7;">
+        <h4>XSS Vulnerability Examples to Test:</h4>
+        <p>Try entering these payloads in the comment field or search box:</p>
+        <ul>
+            <li><code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code></li>
+            <li><code>&lt;img src=x onerror=alert('XSS')&gt;</code></li>
+            <li><code>&lt;svg onload=alert('XSS')&gt;</code></li>
+            <li><code>&lt;iframe src=javascript:alert('XSS')&gt;</code></li>
+        </ul>
+    </div>
+
+    <p><a href="/">← Back to Home</a></p>
+</body>
+</html>
